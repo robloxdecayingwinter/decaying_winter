@@ -187,8 +187,11 @@ local Weapons = {
     ["Modded Rifle"] = "Rifle";
     ["Rifle"] = "Rifle";
     ["Advanced IFAK"] = "FAid";
+    ["IFAK"] = "FAid";
     ["Firerier Axe"] = "DFAxe";
     ["Tactical Armour"] = "APack";
+    ["Armour"] = "APack";
+    ["Armor"] = "APack";
     ["Crafted Knife"] = "CRKnife";
     ["Rake"] = "Rake";
     ["Yari"] = "Yari";
@@ -227,6 +230,7 @@ local Weapons = {
     ["Crowbar"] = "CBar";
     ["I4S-DS"] = "DEFStim";
     ["3-(cbSTM)"] = "DStim";
+    ["cbSTM"] = "DStim";
     ["Cocktail Perithesene"] = "HStim";
     ["Perithesene"] = "HStim";
     ["Broken Taser"] = "Taser";
@@ -267,6 +271,8 @@ local Weapons = {
     ["PDW"] = "SubMG";
     ["Crafted Explosive"] = "CRNade";
     ["BL1 (Neloprephine)"] = "SStim";
+    ["Neloprephine"] = "SStim";
+    ["Heroin"] = "SStim";
     ["Used Stim"] = "TStim";
     ["Hemostatic Zanustin"] = "AdrStim";
     ["Crafted Splint"] = "CRSplint";
@@ -2250,23 +2256,26 @@ game.Workspace.Interactables.ChildAdded:Connect(function(v)
     end
 end)
 --]]
-
+print("pee")
 for i,v in pairs(game.Workspace:GetDescendants()) do
     EspHandle(v)
-    if v ~= nil and v.Parent ~= nil and v.Parent.Name == "activeHostiles" or v.Parent.Name == "NoTarget" then
+    if v.Parent ~= nil and v.Parent.Name == "activeHostiles" or v.Parent ~= nil and v.Parent.Name == "NoTarget" then
         if v:IsA("Model") then
             table.insert(Enemies, v)
         end
     end
 end
-
+print("12875678125")
 
 game.Workspace.DescendantAdded:Connect(function(v)
     EspHandle(v)
-    if v ~= nil and v.Parent ~= nil and v.Parent.Name == "activeHostiles" or v.Parent.Name == "NoTarget" then
+    if v:IsA("Model") and v:FindFirstAncestor(game.Players.LocalPlayer.Name) then
+        workspace.ServerStuff.claimItem:InvokeServer(v)
+    end
+    if v.Parent ~= nil and v.Parent.Name == "activeHostiles" or v.Parent ~= nil and v.Parent.Name == "NoTarget" then
         if v:IsA("Model") then
             if Toggles.AutoKill then
-                local Head = v:WaitForChild("Head", 20)
+                local Head = v:WaitForChild("Head",15)
                 local data = {
                     [1] = "gundamage";
                     [2] = v;
@@ -2284,13 +2293,9 @@ game.Workspace.DescendantAdded:Connect(function(v)
             table.insert(Enemies, v)
         end
     end
-    if v:IsA("Model") and v:FindFirstAncestor(game.Players.LocalPlayer.Name) then
-        workspace.ServerStuff.claimItem:InvokeServer(v)
-    end
 end)
 
 SetupGUI()
-
 
 repeat wait() until _G.Code1 ~= nil and _G.Code2 ~= nil
 
