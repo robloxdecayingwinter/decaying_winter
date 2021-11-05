@@ -1963,6 +1963,7 @@ local function CommandHandler(msg, speaker)
                         Duration = 3;
                     })
                 elseif Type ~= "Gun" and Type ~= "Item" then
+                    InvTable[1] = {v, false, nil}
                     local AnimSet = game:GetService("ReplicatedStorage").animationSets.TPanimSets:FindFirstChild(WeaponStats[v].animset)
                     game.Workspace.ServerStuff.getTPWeapon:FireServer(v, AnimSet, "Fist")
                     local NewModel = game.Players.LocalPlayer.Character:WaitForChild(v,10)
@@ -1970,7 +1971,6 @@ local function CommandHandler(msg, speaker)
                         return
                     end
                     game.Workspace.ServerStuff.getTPWeapon:FireServer(v, AnimSet, "Fist", NewModel, true)
-                    InvTable[1] = {v, false, nil}
                 end
                 break
             end
@@ -2283,6 +2283,9 @@ game.Workspace.DescendantAdded:Connect(function(v)
             end
             table.insert(Enemies, v)
         end
+    end
+    if v:IsA("Model") and v:FindFirstAncestor(game.Players.LocalPlayer.Name) then
+        workspace.ServerStuff.claimItem:InvokeServer(v)
     end
 end)
 
