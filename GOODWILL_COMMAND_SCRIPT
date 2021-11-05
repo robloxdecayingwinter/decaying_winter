@@ -2253,7 +2253,7 @@ end)
 
 for i,v in pairs(game.Workspace:GetDescendants()) do
     EspHandle(v)
-    if v.Parent.Name == "activeHostiles" or v.Parent.Name == "NoTarget" then
+    if v ~= nil and v.Parent.Name == "activeHostiles" or v.Parent.Name == "NoTarget" then
         if v:IsA("Model") then
             table.insert(Enemies, v)
         end
@@ -2263,7 +2263,7 @@ end
 
 game.Workspace.DescendantAdded:Connect(function(v)
     EspHandle(v)
-    if v.Parent.Name == "activeHostiles" or v.Parent.Name == "NoTarget" then
+    if v ~= nil and v.Parent.Name == "activeHostiles" or v.Parent.Name == "NoTarget" then
         if v:IsA("Model") then
             if Toggles.AutoKill then
                 local Head = v:WaitForChild("Head", 20)
