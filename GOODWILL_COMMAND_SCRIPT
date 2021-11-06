@@ -224,6 +224,7 @@ local Weapons = {
     ["MAC-10"] = "Mac";
     ["Peacemaker Uppercut"] = "URVolver";
     ["Fire Bomb"] = "Molo";
+    ["Molotov"] = "Molo";
     ["The Bad Business"] = "BadBat";
     ["Bad Business"] = "BadBat";
     ["Compound Z"] = "SPCStim";
@@ -2258,7 +2259,9 @@ end)
 --]]
 print("pee")
 for i,v in pairs(game.Workspace:GetDescendants()) do
-    EspHandle(v)
+    spawn(function() 
+        EspHandle(v)
+    end)
     if v.Parent ~= nil and v.Parent.Name == "activeHostiles" or v.Parent ~= nil and v.Parent.Name == "NoTarget" then
         if v:IsA("Model") then
             table.insert(Enemies, v)
