@@ -136,6 +136,7 @@ local Weapons = {
     ["SCAR-H"] = "SubScar";
     ["Estoc"] = "ESword";
     ["Polters Last Breath"] = "GhostBomb";
+    ["GhostBomb"] = "GhostBomb";
     ["Great Sword"] = "GSword";
     ["Shadow Claws"] = "SClaw";
     ["Claws"] = "SClaw";
@@ -239,6 +240,7 @@ local Weapons = {
     ["Compound MilBow"] = "CPBow";
     ["M67 Grenade"] = "MGrenade";
     ["A.J.M. 9"] = "AJM";
+    ["AJM 9"] = "AJM";
     ["Aseptic Bandage"] = "ADBandage";
     ["Smoke Bomb"] = "CRSBomb";
     ["Shovel"] = "Shovel";
@@ -251,8 +253,11 @@ local Weapons = {
     ["The Decimator"] = "RBHammer";
     ["Decimator"] = "RBHammer";
     ["Mark VII"] = "Deagle";
+    ["Deagle"] = "Deagle";
     ["Karabiner 98k"] = "KarSniper";
     ["Ice Axe"] = "IPick";
+    ["GhostKnife"] = "GhostKnife";
+    ["Polters Last Wish"] = "GhostKnife";
     ["Caldwell Handcannon"] = "DBarrel";
     ["Crafted Bow"] = "CRBow";
     ["SPAS-12"] = "SPShotgun";
@@ -723,7 +728,11 @@ local function StatusAdded(new)
     repeat wait() until EffectsTable[new.Name] ~= nil
     wait()
     if new:IsA("Frame") and EffectsTable ~= nil and EffectsTable[new.Name] ~= nil and not string.find(new.Name,"Virus") then
-        EffectsTable[new.Name].effects.currentduration = 0
+        if EffectsTable[new.Name].effects ~= nil and EffectsTable[new.Name].effects.currentduration ~= nil and EffectsTable[new.Name].effects.colour ~= nil then
+            if EffectsTable[new.Name].effects.colour == Color3.new(1,0.05,0.05) or EffectsTable[new.Name].effects.colour == false then
+                EffectsTable[new.Name].effects.currentduration = 0
+            end
+        end
     end
 end
 
@@ -1329,8 +1338,10 @@ local function CommandHandler(msg, speaker)
         local currenttext = ""
         if Toggle == true then
             for i,v in pairs(EffectsTable) do
-                if not string.find(i, "Virus") then
-                    EffectsTable[i].effects.currentduration = 0
+                if not string.find(i, "Virus") and v.effects ~= nil and v.effects.currentduration ~= nil and v.effects.colour ~= nil then
+                    if v.effects.colour == Color3.new(1,0.05,0.05) or v.effects.colour == false then
+                        v.effects.currentduration = 0
+                    end
                 end
             end
             currenttext = "AntiDebuff is now ON!"
@@ -1487,8 +1498,10 @@ local function CommandHandler(msg, speaker)
             GrabEssentials()
         end
         for i,v in pairs(EffectsTable) do
-            if not string.find(i, "Virus") then
-                EffectsTable[i].effects.currentduration = 0
+            if not string.find(i, "Virus") and v.effects ~= nil and v.effects.currentduration ~= nil and v.effects.colour ~= nil then
+                if v.effects.colour == Color3.new(1,0.05,0.05) or v.effects.colour == false then
+                    v.effects.currentduration = 0
+                end
             end
         end
         return
@@ -2109,16 +2122,20 @@ mouse.KeyDown:Connect(function(key)
             GrabEssentials()
         end
         for i,v in pairs(EffectsTable) do
-            if not string.find(i, "Virus") then
-                EffectsTable[i].effects.currentduration = 0
+            if not string.find(i, "Virus") and v.effects ~= nil and v.effects.currentduration ~= nil and v.effects.colour ~= nil then
+                if v.effects.colour == Color3.new(1,0.05,0.05) or v.effects.colour == false then
+                    v.effects.currentduration = 0
+                end
             end
         end
         return
     end
     if key == "m" and _G.Code1 ~= nil and _G.Code2 ~= nil then
         for i,v in pairs(EffectsTable) do
-            if not string.find(i, "Virus") then
-                EffectsTable[i].effects.currentduration = 0
+            if not string.find(i, "Virus") and v.effects ~= nil and v.effects.currentduration ~= nil and v.effects.colour ~= nil then
+                if v.effects.colour == Color3.new(1,0.05,0.05) or v.effects.colour == false then
+                    v.effects.currentduration = 0
+                end
             end
         end
         return
