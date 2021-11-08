@@ -30,6 +30,7 @@ local CurrentWeapon = ""
 local RenderStepConnection = nil
 local Enemies = {}
 local KillAuraDistance = 30
+local AkimboActive = false
 local GuiCommands = {"InfClip","InfAmmo","Godmode","OneShot","NoCooldown","SilentAim","AutoParry","KillAura","AutoKill","VirusBlock","AntiDebuff","NoHunger","AntiFallDamage","AntiRecoil","SuperRun"}
 
 
@@ -168,6 +169,9 @@ local Weapons = {
     ["Punjis"] = "PTrap";
     ["Combat Knife"] = "CKnife";
     ["Caldwell 940"] = "DoubleShotgun";
+    ["940"] = "DoubleShotgun";
+    ["Double Barrel"] = "DoubleShotgun";
+    ["DoubleBarrel"] = "DoubleShotgun";
     ["Snares"] = "SSnare";
     ["Crafted Quiver"] = "CRQuiver";
     ["Tomahawk"] = "THawk";
@@ -259,6 +263,7 @@ local Weapons = {
     ["GhostKnife"] = "GhostKnife";
     ["Polters Last Wish"] = "GhostKnife";
     ["Caldwell Handcannon"] = "DBarrel";
+    ["Handcannon"] = "DBarrel";
     ["Crafted Bow"] = "CRBow";
     ["SPAS-12"] = "SPShotgun";
     ["KRISS Vector"] = "SubVector";
@@ -563,7 +568,7 @@ local function RenderStepped()
                 local data = {
                     [1] = "gundamage";
                     [2] = Enemies[i];
-                    [3] = math.huge;
+                    [3] = 9e9;
                     [4] = true;
                     [5] = "KShotgun";
                     [6] = false;
@@ -658,8 +663,15 @@ local function ReserveChanged()
     end
 end
 
+
+local function AkimboChanged(child, new)
+    if new == nil or not child:FindFirstAncestor("Workspace") then
+        AkimboActive = false
+    end
+end
+
 local function ClipChanged()
-    if Toggles.InfClip and not string.find(string.lower(ClipLabel.Text), "inf") then
+    if Toggles.InfClip--[[ and not string.find(string.lower(ClipLabel.Text), "inf")]] then
         local Pee = getsenv(game.Players.LocalPlayer.Backpack.mainHandler)
         local GetSex = getupvalues(Pee.unloadgun)
         for i,v in pairs(GetSex) do
@@ -668,7 +680,11 @@ local function ClipChanged()
                     if typeof(y) == "table" then
                         for n,m in pairs(y) do
                             if y[n] == tonumber(ClipLabel.Text) then
-                                y[n] = math.huge
+                                if AkimboActive then
+                                    y[n] = 20
+                                else
+                                    y[n] = math.huge
+                                end
                             end
                         end
                     end
@@ -1642,7 +1658,11 @@ local function CommandHandler(msg, speaker)
                         if typeof(y) == "table" then
                             for n,m in pairs(y) do
                                 if y[n] == tonumber(ClipLabel.Text) then
-                                    y[n] = math.huge
+                                    if AkimboActive then
+                                        y[n] = 20
+                                    else
+                                        y[n] = math.huge
+                                    end
                                 end
                             end
                         end
@@ -1872,7 +1892,7 @@ local function CommandHandler(msg, speaker)
                     local data = {
                         [1] = "gundamage";
                         [2] = Enemies[i];
-                        [3] = math.huge;
+                        [3] = 9e9;
                         [4] = true;
                         [5] = "KShotgun";
                         [6] = false;
@@ -1903,7 +1923,7 @@ local function CommandHandler(msg, speaker)
                 local data = {
                     [1] = "gundamage";
                     [2] = Enemies[i];
-                    [3] = math.huge;
+                    [3] = 9e9;
                     [4] = true;
                     [5] = "KShotgun";
                     [6] = false;
@@ -2290,7 +2310,28 @@ print("12875678125")
 game.Workspace.DescendantAdded:Connect(function(v)
     EspHandle(v)
     if v:IsA("Model") and v:FindFirstAncestor(game.Players.LocalPlayer.Name) then
-        workspace.ServerStuff.claimItem:InvokeServer(v)
+        if string.find(v.Name, "AKIMBO") then
+            AkimboActive = true
+print("piss yourself")
+            v.AncestryChanged:Connect(AkimboChanged)
+            local Pee = getsenv(game.Players.LocalPlayer.Backpack.mainHandler)
+            local GetSex = getupvalues(Pee.unloadgun)
+            for i,v in pairs(GetSex) do
+                if typeof(v) == "table"  then
+                    for x,y in pairs(v) do
+                        if typeof(y) == "table" then
+                            for n,m in pairs(y) do
+                                if y[n] == tonumber(ClipLabel.Text) then
+                                    y[n] = 20
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        else
+            workspace.ServerStuff.claimItem:InvokeServer(v)
+        end
     end
     if v.Parent ~= nil and v.Parent.Name == "activeHostiles" or v.Parent ~= nil and v.Parent.Name == "NoTarget" then
         if v:IsA("Model") then
@@ -2299,7 +2340,7 @@ game.Workspace.DescendantAdded:Connect(function(v)
                 local data = {
                     [1] = "gundamage";
                     [2] = v;
-                    [3] = math.huge;
+                    [3] = 9e9;
                     [4] = true;
                     [5] = "KShotgun";
                     [6] = false;
