@@ -31,7 +31,8 @@ local RenderStepConnection = nil
 local Enemies = {}
 local KillAuraDistance = 30
 local AkimboActive = false
-local CameraShakeFunction = nil
+local CameraShakeFunction
+local DevWeapons = {"JBox","LSMini","GMSword","EMSword","CMMaul","PLBlade"}
 local GuiCommands = {"InfClip","InfAmmo","Godmode","OneShot","NoCooldown","SilentAim","AutoParry","KillAura","AutoKill","VirusBlock","AntiDebuff","NoHunger","AntiFallDamage","AntiRecoil","SuperRun"}
 
 
@@ -71,6 +72,16 @@ local Debounces = {
 local WeaponStats = nil
 
 local Weapons = {
+    ["Juggernaut Box"] = "JBox";
+    ["TYPE-22 LSR-MG"] = "LSMini";
+    ["LSR-MG"] = "LSMini";
+    ["Minigun"] = "LSMini";
+    ["PLASMA Broadsword"] = "GMSword";
+    ["Gabriel's Blade"] = "GMSword";
+    ["Zealot's Blade"] = "EMSword";
+    ["Commander's Maul"] = "CMMaul";
+    ["Maul"] = "CMMaul";
+    -- ["PLASMA Broadsword"] = "PLBlade";
     ["Caltrops"] = "TCaltrop";
     ["Alarm Gun"] = "AlrGun";
     ["Pickaxe"] = "PAxe";
@@ -630,8 +641,9 @@ local function GrabEssentials()
     if TempEnv["ration_system_handler"] ~= nil then
         FoodTable = TempEnv["ration_system_handler"]
     end
-    repeat wait() until TempEnv["shakecamera"] ~= nil
-    if TempEnv["shakecamera"] ~= nil then
+    --[[ CameraShakeFunction = nil
+    if TempEnv["shakecamera"] ~= nil and TempEnv["shakecamera"] ~= CameraShakeFunction then
+        print("hate")
         CameraShakeFunction = hookfunction(TempEnv["shakecamera"], function(...)
             if Toggles.AntiRecoil then
                 return
@@ -639,7 +651,21 @@ local function GrabEssentials()
             return CameraShakeFunction(...)
         end)
     end
-    TempEnv = nil
+--]]
+    if TempEnv["convertToShadow"] ~= nil then
+        for i,v in pairs(getupvalues(TempEnv.convertToShadow)) do
+            if typeof(v) == "function" then
+                local constants = debug.getconstants(v)
+                for x,y in pairs(constants) do
+                    if table.find(DevWeapons,y) then
+                         print(v,x,y)
+                        debug.setconstant(v,x,"DXDXDXDXD")
+                    end
+                end
+            end
+        end
+    end
+    --TempEnv = nil
     FunnyPlace = nil
 end
 
@@ -2210,6 +2236,11 @@ game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
     _G.Code2 = nil
     repeat wait() until character:FindFirstChild("Humanoid")
     Humanoid = character:FindFirstChild("Humanoid")
+    local Head = game.Players.LocalPlayer.Character:WaitForChild("Head",10)
+    if Head == nil then
+        return
+    end
+    -- print("peesuck")
     Humanoid.HealthChanged:Connect(HealthChanged)
     repeat wait() until game.Players.LocalPlayer:FindFirstChild("PlayerGui")
     repeat wait() until game.Players.LocalPlayer:FindFirstChild("Backpack")
@@ -2254,8 +2285,9 @@ end)
 repeat wait() until game.Players.LocalPlayer:FindFirstChild("Backpack")
 repeat wait() until game.Players.LocalPlayer.Backpack:FindFirstChild("mainHandler")
 
-
-GrabEssentials()
+if game.Players.LocalPlayer.Character ~= nil then
+    GrabEssentials()
+end
 
 repeat wait() until game.Players.LocalPlayer:FindFirstChild("PlayerGui")
 repeat wait() until game.Players.LocalPlayer.PlayerGui:FindFirstChild("mainHUD")
@@ -2305,7 +2337,6 @@ game.Workspace.Interactables.ChildAdded:Connect(function(v)
     end
 end)
 --]]
-print("pee")
 for i,v in pairs(game.Workspace:GetDescendants()) do
     spawn(function() 
         if v ~= nil and v.Parent ~= nil then
@@ -2318,14 +2349,12 @@ for i,v in pairs(game.Workspace:GetDescendants()) do
         end
     end
 end
-print("12875678125")
 
 game.Workspace.DescendantAdded:Connect(function(v)
     EspHandle(v)
     if v:IsA("Model") and v:FindFirstAncestor(game.Players.LocalPlayer.Name) then
         if string.find(v.Name, "AKIMBO") then
             AkimboActive = true
-print("piss yourself")
             v.AncestryChanged:Connect(AkimboChanged)
             local Pee = getsenv(game.Players.LocalPlayer.Backpack.mainHandler)
             local GetSex = getupvalues(Pee.unloadgun)
