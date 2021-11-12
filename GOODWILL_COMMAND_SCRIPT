@@ -31,8 +31,8 @@ local RenderStepConnection = nil
 local Enemies = {}
 local KillAuraDistance = 30
 local AkimboActive = false
-local CameraShakeFunction
-local DevWeapons = {"JBox","LSMini","GMSword","EMSword","CMMaul","PLBlade"}
+-- local CameraShakeFunction
+local DevWeapons = {"RVolver","JBox","LSMini","GMSword","EMSword","CMMaul","PLBlade"}
 local GuiCommands = {"InfClip","InfAmmo","Godmode","OneShot","NoCooldown","SilentAim","AutoParry","KillAura","AutoKill","VirusBlock","AntiDebuff","NoHunger","AntiFallDamage","AntiRecoil","SuperRun"}
 
 
@@ -641,9 +641,23 @@ local function GrabEssentials()
     if TempEnv["ration_system_handler"] ~= nil then
         FoodTable = TempEnv["ration_system_handler"]
     end
-    --[[ CameraShakeFunction = nil
-    if TempEnv["shakecamera"] ~= nil and TempEnv["shakecamera"] ~= CameraShakeFunction then
-        print("hate")
+    if TempEnv["convertToShadow"] ~= nil then
+        for i,v in pairs(getupvalues(TempEnv.convertToShadow)) do
+            if typeof(v) == "function" then
+                local constants = debug.getconstants(v)
+                for x,y in pairs(constants) do
+                    if table.find(DevWeapons,y) then
+                        --print(v,x,y)
+                        debug.setconstant(v,x,"DXDXDXDXD")
+                    end
+                end
+            end
+        end
+    end
+
+
+    if TempEnv["shakecamera"] ~= nil then
+        local CameraShakeFunction
         CameraShakeFunction = hookfunction(TempEnv["shakecamera"], function(...)
             if Toggles.AntiRecoil then
                 return
@@ -651,21 +665,8 @@ local function GrabEssentials()
             return CameraShakeFunction(...)
         end)
     end
---]]
-    if TempEnv["convertToShadow"] ~= nil then
-        for i,v in pairs(getupvalues(TempEnv.convertToShadow)) do
-            if typeof(v) == "function" then
-                local constants = debug.getconstants(v)
-                for x,y in pairs(constants) do
-                    if table.find(DevWeapons,y) then
-                         print(v,x,y)
-                        debug.setconstant(v,x,"DXDXDXDXD")
-                    end
-                end
-            end
-        end
-    end
-    --TempEnv = nil
+
+    TempEnv = nil
     FunnyPlace = nil
 end
 
@@ -1152,6 +1153,30 @@ namecall = hookmetamethod(game, "__namecall", function(self, ...)
         local Args = {...}
         if tostring(self) == "getTPWeapon" then
             CurrentWeapon = Args[1]
+        end
+        if tostring(self) == "deathPlay" then
+            local TempEnv = getsenv(game.Players.LocalPlayer.Backpack.mainHandler)
+            local TempUpValues = getupvalues(TempEnv.start_dual_wield)
+            for i,v in pairs(TempUpValues) do
+                if typeof(v) == "table" and v[1] ~= nil and typeof(v[1]) == "table" and typeof(v[1][1]) == "string" and typeof(v[1][2]) == "boolean" then
+                    for x,y in pairs(v) do
+                        if table.find(DevWeapons,y[1]) then
+                            v[x] = {"Fist", false, nil}
+                        end
+                    end
+                end
+            end
+            spawn(function()
+                wait(1)
+                game.Workspace.ServerStuff.deathPlay.FireServer(game.Workspace.ServerStuff.deathPlay)
+            end)
+            return
+        end
+        if tostring(self) == "throwWeapon" then
+            if table.find(DevWeapons,tostring(Args[1])) then
+                Args[1] = "XDXDXDXDXDXDXDXDXD"
+                return namecall(self, unpack(Args))
+            end
         end
         if tostring(self) == "dropAmmo" and Args[1] == "agent_container" and typeof(Args[2]) == "table" and typeof(Args[2][1]) == "table" then
             for i,v in pairs(Args[2][1]) do
@@ -1740,8 +1765,11 @@ local function CommandHandler(msg, speaker)
         local currenttext = ""
         local TempEnv = getsenv(game.Players.LocalPlayer.Backpack.mainHandler)
         if Toggle == true then
+            --hookfunction(TempEnv["shakecamera"],function()end)
             currenttext = "AntiRecoil is now ON!"
         else
+            --print(CameraShakeFunction)
+            --hookfunction(TempEnv["shakecamera"],CameraShakeFunction)
             currenttext = "AntiRecoil is now OFF!"
         end
         TempEnv = nil
@@ -2231,7 +2259,13 @@ Humanoid = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
 
 Humanoid.HealthChanged:Connect(HealthChanged)
 
+repeat wait() until game.Workspace:FindFirstChild("activePlayers")
+game.Workspace.activePlayers.ChildAdded:Connect(function(child)
+    print("PISSSSSSSSSS")
+end)
+
 game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
+print("loaded character")
     _G.Code1 = nil
     _G.Code2 = nil
     repeat wait() until character:FindFirstChild("Humanoid")
