@@ -834,7 +834,7 @@ local function EspHandle(v)
         if string.find(v.Value, "Shadow") then
             local EspItem = Mark(v.Parent:FindFirstChild("Head"), EspInfo.Scavs[v.Value], EspInfo.Toggles.Demons)
             table.insert(EspObjects.Demons,EspItem)
-        else
+        elseif v.Parent ~= nil then
             local EspItem = Mark(v.Parent:FindFirstChild("Head"), EspInfo.Scavs[v.Value], EspInfo.Toggles.Enemies)
             table.insert(EspObjects.Enemies,EspItem)
         end
@@ -1949,8 +1949,11 @@ local function CommandHandler(msg, speaker)
         game.Players.LocalPlayer.PlayerGui.mainHUD.InventoryFrame.slot5.Visible = true;
         local TempEnv = getsenv(game.Players.LocalPlayer.Backpack.mainHandler)
         local TempUpValues = getupvalues(TempEnv.start_dual_wield)
+        local TempEnv = getsenv(game.Players.LocalPlayer.Backpack.mainHandler)
+        local TempUpValues = getupvalues(TempEnv.start_dual_wield)
+        local InvTable = nil
         for i,v in pairs(TempUpValues) do
-            if typeof(v) == "table" and v[1] ~= nil and typeof(v[1]) == "table" and v[1][1] == "Fist" then
+            if typeof(v) == "table" and v[1] ~= nil and typeof(v[1]) == "table" and typeof(v[1][1]) == "string" and typeof(v[1][2]) == "boolean" then
                 v[5] = { "Fist", false, nil }
                 v[6] = { "Fist", false, nil }
             end
@@ -2018,14 +2021,16 @@ local function CommandHandler(msg, speaker)
         InvTable = nil
         TempEnv = nil
         TempUpValues = nil
+        return
     end
 
-    if IsInTable({"spawn","give","giveitem","spawnitem","giveme","gunspawn","spawngun"}, Args.Command) then
+    if IsInTable({"weaponnames","names","weapons","spawnitems","guns"}, Args.Command) then
         print("====== WEAPON NAMES ======")
         for i,v in pairs(Weapons) do
             print(i)
         end
         print("==========================")
+        return
     end
 
 end
@@ -2142,7 +2147,7 @@ mouse.KeyDown:Connect(function(key)
             GrabEssentials()
         end
         for i,v in pairs(EffectsTable) do
-            if not string.find(i, "Virus") and v.effects ~= nil and v.effects.currentduration ~= nil and v.effects.colour ~= nil then
+            if not string.find(i, "Virus") and v["effects"] ~= nil and typeof(v.effects) == "table" and v.effects["currentduration"] ~= nil and typeof(v.effects) ~= "Color3" and v.effects.colour ~= nil then
                 if v.effects.colour == Color3.new(1,0.05,0.05) or v.effects.colour == false or i == "Burning" or i == "Exhaustion" then
                     v.effects.currentduration = 0
                 end
@@ -2150,10 +2155,13 @@ mouse.KeyDown:Connect(function(key)
         end
         return
     end
-    if key == "m" and _G.Code1 ~= nil and _G.Code2 ~= nil then
+    if key == "m" then
+        if EffectsTable == nil then
+            GrabEssentials()
+        end
         for i,v in pairs(EffectsTable) do
-            if not string.find(i, "Virus") and v.effects ~= nil and v.effects.currentduration ~= nil and v.effects.colour ~= nil then
-                if v.effects.colour == Color3.new(1,0.05,0.05) or v.effects.colour == false or i == "Burning" or i == "Exhaustion" then
+            if not string.find(i, "Virus") and v["effects"] ~= nil and typeof(v.effects) == "table" and v.effects["currentduration"] ~= nil and typeof(v.effects) ~= "Color3" and v.effects.colour ~= nil then
+                if v.effects.colour == false or i == "Burning" or i == "Exhaustion" or v.effects.colour == Color3.new(1,0.05,0.05) then
                     v.effects.currentduration = 0
                 end
             end
@@ -2297,7 +2305,9 @@ end)
 print("pee")
 for i,v in pairs(game.Workspace:GetDescendants()) do
     spawn(function() 
-        EspHandle(v)
+        if v ~= nil and v.Parent ~= nil then
+            EspHandle(v)
+        end
     end)
     if v.Parent ~= nil and v.Parent.Name == "activeHostiles" or v.Parent ~= nil and v.Parent.Name == "NoTarget" then
         if v:IsA("Model") then
