@@ -31,6 +31,7 @@ local RenderStepConnection = nil
 local Enemies = {}
 local KillAuraDistance = 30
 local AkimboActive = false
+local CameraShakeFunction = nil
 local GuiCommands = {"InfClip","InfAmmo","Godmode","OneShot","NoCooldown","SilentAim","AutoParry","KillAura","AutoKill","VirusBlock","AntiDebuff","NoHunger","AntiFallDamage","AntiRecoil","SuperRun"}
 
 
@@ -629,6 +630,15 @@ local function GrabEssentials()
     if TempEnv["ration_system_handler"] ~= nil then
         FoodTable = TempEnv["ration_system_handler"]
     end
+    repeat wait() until TempEnv["shakecamera"] ~= nil
+    if TempEnv["shakecamera"] ~= nil then
+        CameraShakeFunction = hookfunction(TempEnv["shakecamera"], function(...)
+            if Toggles.AntiRecoil then
+                return
+            end
+            return CameraShakeFunction(...)
+        end)
+    end
     TempEnv = nil
     FunnyPlace = nil
 end
@@ -1181,15 +1191,6 @@ namecall = hookmetamethod(game, "__namecall", function(self, ...)
     return namecall(self, ...)
 end)
 
-newindex = hookmetamethod(game, "__newindex", function(self, index, value)
-    if Toggles.AntiRecoil then
-        if index == "CFrame" and tostring(self) == "Camera" and self.CameraType ~= Enum.CameraType.Scriptable and tostring(getcallingscript()) == "mainHandler" then
-            return
-        end
-    end
-    return newindex(self, index, value)
-end)
-
 local function getargs(inputstring)
     inputstring = string.lower(inputstring)
     inputstring = string.gsub(inputstring, "'", "")
@@ -1711,11 +1712,13 @@ local function CommandHandler(msg, speaker)
         end
         Toggles.AntiRecoil = Toggle
         local currenttext = ""
+        local TempEnv = getsenv(game.Players.LocalPlayer.Backpack.mainHandler)
         if Toggle == true then
             currenttext = "AntiRecoil is now ON!"
         else
             currenttext = "AntiRecoil is now OFF!"
         end
+        TempEnv = nil
         game.StarterGui:SetCore("SendNotification", {
             Title = "notification";
             Text = currenttext;
