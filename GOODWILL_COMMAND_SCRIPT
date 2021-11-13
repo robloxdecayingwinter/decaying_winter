@@ -1174,7 +1174,12 @@ namecall = hookmetamethod(game, "__namecall", function(self, ...)
         end
         if tostring(self) == "throwWeapon" then
             if table.find(DevWeapons,tostring(Args[1])) then
-                Args[1] = "LPipe"
+                if game.Players.LocalPlayer.Character ~= nil and game.Players.LocalPlayer.Character.FindFirstChild(game.Players.LocalPlayer.Character, "hasPrimary") then
+                    if game.Players.LocalPlayer.Character.hasPrimary.FindFirstChild(game.Players.LocalPlayer.Character.hasPrimary, Args[1]) then
+                         game.Players.LocalPlayer.Character.hasPrimary.Parent = nil
+                    end
+                end
+                Args[1] = "XDXDXDXDXDXDXDXDXDXD"
                 return namecall(self, unpack(Args))
             end
         end
@@ -2090,6 +2095,51 @@ local function CommandHandler(msg, speaker)
         return
     end
 
+    if IsInTable({"teamkill","enemy","nemesis","scavmode","enemymode"}, Args.Command) then
+        local TempEnv = getsenv(game.Players.LocalPlayer.Backpack.mainHandler)
+        local TempUpValues = getupvalues(TempEnv.start_dual_wield)
+        local InvTable = nil
+        for i,v in pairs(TempUpValues) do
+            if typeof(v) == "table" and v[1] ~= nil and typeof(v[1]) == "table" and typeof(v[1][1]) == "string" and typeof(v[1][2]) == "boolean" then
+                InvTable = v
+                break
+            end
+        end
+        local OldMelee = InvTable[1][1] -- this is gonna be SCUFFED
+        InvTable[1] = { "PLBlade", false, nil}
+
+        local AnimSet = game:GetService("ReplicatedStorage").animationSets.TPanimSets:FindFirstChild(WeaponStats["PLBlade"].animset)
+        game.Workspace.ServerStuff.getTPWeapon:FireServer("PLBlade", AnimSet, "Fist")
+        local NewModel = game.Players.LocalPlayer.Character:WaitForChild("PLBlade", 20)
+        game.Workspace.ServerStuff.claimItem:InvokeServer(NewModel)
+        game.Workspace.ServerStuff.getTPWeapon:FireServer("PLBlade", AnimSet, "Fist", NewModel, true)
+        wait(0.3)
+        keypress(0x31)
+        keyrelease(0x31)
+        wait(0.6)
+        InvTable[1] = {"Fist", false, nil}
+        wait()
+        keypress(0x31)
+        keyrelease(0x31)
+        if game.Players.LocalPlayer.Character ~= nil and game.Players.LocalPlayer.Character:FindFirstChild("hasPrimary") then
+            game.Players.LocalPlayer.Character.hasPrimary:Destroy()
+        end
+        if OldMelee ~= "Fist" then
+            local AnimSet = game:GetService("ReplicatedStorage").animationSets.TPanimSets:FindFirstChild(WeaponStats[OldMelee].animset)
+            game.Workspace.ServerStuff.getTPWeapon:FireServer(OldMelee, AnimSet, "Fist")
+            local NewModel = game.Players.LocalPlayer.Character:WaitForChild("PLBlade", 20)
+            game.Workspace.ServerStuff.claimItem:InvokeServer(NewModel)
+            game.Workspace.ServerStuff.getTPWeapon:FireServer(OldMelee, AnimSet, "Fist", NewModel, true)
+            wait(0.3)
+            keypress(0x31)
+            keyrelease(0x31)
+        end
+        InvTable = nil
+        TempEnv = nil
+        TempUpValues = nil
+        return
+    end
+
 end
 
 game.Players.LocalPlayer.Chatted:Connect(function(msg)
@@ -2261,7 +2311,7 @@ Humanoid.HealthChanged:Connect(HealthChanged)
 
 repeat wait() until game.Workspace:FindFirstChild("activePlayers")
 game.Workspace.activePlayers.ChildAdded:Connect(function(child)
-    print("PISSSSSSSSSS")
+    -- print("PISSSSSSSSSS")
 end)
 
 game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
@@ -2506,6 +2556,8 @@ COMMANDS CAN BE DONE AS /e command OR :command
 
 :spawn WEAPONNAME - gives you WEAPONNAME (cannot be dropped) (guns require an empty slot)
 :weaponnames - prints all the available weapon names in the dev console
+
+:teamkill - Let's you hurt / kill your teammates >:D
 
 :cig - makes you super cool
 :uncig - frees you of your nicotine addiction
