@@ -33,7 +33,7 @@ local KillAuraDistance = 30
 local AkimboActive = false
 -- local CameraShakeFunction
 local DevWeapons = {"RVolver","JBox","LSMini","GMSword","EMSword","CMMaul","PLBlade"}
-local GuiCommands = {"InfClip","InfAmmo","Godmode","OneShot","NoCooldown","SilentAim","AutoParry","KillAura","AutoKill","VirusBlock","AntiDebuff","NoHunger","AntiFallDamage","AntiRecoil","SuperRun"}
+local GuiCommands = {"InfClip","InfAmmo","Godmode","OneShot","NoCooldown","SilentAim","AutoParry","KillAura","AutoKill","VirusBlock","AntiDebuff","NoHunger","AntiFallDamage","AntiRecoil","SuperRun","TeamKill"}
 
 
 local Toggles = {
@@ -2124,6 +2124,7 @@ local function CommandHandler(msg, speaker)
         if game.Players.LocalPlayer.Character ~= nil and game.Players.LocalPlayer.Character:FindFirstChild("hasPrimary") then
             game.Players.LocalPlayer.Character.hasPrimary:Destroy()
         end
+        wait(0.1)
         if OldMelee ~= "Fist" then
             local AnimSet = game:GetService("ReplicatedStorage").animationSets.TPanimSets:FindFirstChild(WeaponStats[OldMelee].animset)
             game.Workspace.ServerStuff.getTPWeapon:FireServer(OldMelee, AnimSet, "Fist")
