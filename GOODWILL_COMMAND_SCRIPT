@@ -1173,7 +1173,7 @@ namecall = hookmetamethod(game, "__namecall", function(self, ...)
         end
         if tostring(self) == "throwWeapon" then
             if table.find(DevWeapons,tostring(Args[1])) then
-                Args[1] = "XDXDXDXDXDXDXDXDXD"
+                Args[1] = "LPipe"
                 return namecall(self, unpack(Args))
             end
         end
@@ -2264,15 +2264,10 @@ game.Workspace.activePlayers.ChildAdded:Connect(function(child)
 end)
 
 game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
-print("loaded character")
     _G.Code1 = nil
     _G.Code2 = nil
     repeat wait() until character:FindFirstChild("Humanoid")
     Humanoid = character:FindFirstChild("Humanoid")
-    local Head = game.Players.LocalPlayer.Character:WaitForChild("Head",10)
-    if Head == nil then
-        return
-    end
     -- print("peesuck")
     Humanoid.HealthChanged:Connect(HealthChanged)
     repeat wait() until game.Players.LocalPlayer:FindFirstChild("PlayerGui")
