@@ -81,7 +81,7 @@ local Weapons = {
     ["Zealot's Blade"] = "EMSword";
     ["Commander's Maul"] = "CMMaul";
     ["Maul"] = "CMMaul";
-    -- ["PLASMA Broadsword"] = "PLBlade";
+    ["brokenplasma"] = "PLBlade";
     ["Caltrops"] = "TCaltrop";
     ["Alarm Gun"] = "AlrGun";
     ["Pickaxe"] = "PAxe";
@@ -2406,6 +2406,11 @@ game.Workspace.DescendantAdded:Connect(function(v)
             end
         else
             workspace.ServerStuff.claimItem:InvokeServer(v)
+            wait(0.6)
+            if v.Name == "LSMini" and CurrentWeapon ~= "LSMini" then
+                local AnimSet = game:GetService("ReplicatedStorage").animationSets.TPanimSets:FindFirstChild(WeaponStats["LSMini"].animset)
+                game.Workspace.ServerStuff.getTPWeapon:FireServer("LSMini", AnimSet, CurrentWeapon)
+            end
         end
     end
     if v.Parent ~= nil and v.Parent.Name == "activeHostiles" or v.Parent ~= nil and v.Parent.Name == "NoTarget" then
